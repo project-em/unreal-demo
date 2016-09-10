@@ -4,16 +4,11 @@ import heroku_logger
 # from alexa import Alexa
 
 class UnrealCommand(object):
-
-    Pickup = 1
-
-    def translate_route(api_route):
-        if api_route == 'pickup':
-            return Pickup
-        elif api_route == 'foo':
-            return Pickup
-        else:
-            return -1
+    QueryWorld = 0
+    PressRed = 1
+    PressBlue = 2
+    PressGreen = 3
+    PressYellow = 4
 
 class UnrealSocket(object):
 
@@ -31,15 +26,6 @@ class UnrealSocket(object):
         active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         active_socket.connect((self.host, self.port))
     
-    def process_command(self, api_route, params=[]):
-        params.append('[end]')
-        active_socket.send(UnrealCommand.translate_route(api_route), params.join(' '))
-        # Step 5
-        (command, params) = parse_command(self.recv(1024))
-        # Step 6
-        # Alexa.execute(command, params)
-
-    def parse_command(return_date):
-        split_data = return_date.split(' ')
-        command = return_date[0]
-        params = return_date[0:-1]
+    def process_command(self, command):
+        active_socket.send('{0}\n'.format(command))
+        # Step 5 and 6 are done via rest call
