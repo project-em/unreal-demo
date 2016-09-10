@@ -20,6 +20,15 @@ void ATCPSocket::BeginPlay()
 	
 }
 
+
+// Called when the game starts or when spawned
+void ATCPSocket::BeginDestroy()
+{
+	Super::BeginDestroy();
+	ShutdownSocket();
+
+}
+
 // Called every frame
 void ATCPSocket::Tick( float DeltaTime )
 {
@@ -29,7 +38,7 @@ void ATCPSocket::Tick( float DeltaTime )
 
 void ATCPSocket::CreateSocket()
 {
-	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("default"), false);
+	socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("default"), false);
 	address = TEXT("158.130.163.72");
 	// local ip address: 158.130.160.251
 	// port 5000
@@ -37,26 +46,31 @@ void ATCPSocket::CreateSocket()
 	// FIPv4Address ip;
 	// FIPv4Address::Parse(address, ip);
 	bool canBind;
-	TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(AlexaLogger, canBind);
+	TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(*GLog, canBind);
 	// addr->SetIp(ip.Value);
-	port = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->BindNextPort(Socket, *addr, 1000, 1);
-	// addr->SetPort(port);
-	// Socket->Bind(*addr);
-	Socket->Listen(1);
-	FInternetAddr tempAddr;
-	Socket->GetAddress(tempAddr);
-	UE_LOG(LogTemp, Warning, TEXT("Host: %s, Port: %i, connected: %d"), tempAddr.ToString(), port, connected);
+	port = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->BindNextPort(socket, *addr, 1000, 1);
+	addr->SetPort(port);
+	socket->Bind(*addr);
+	socket->Listen(1);
+	address = addr->ToString(false);
+	UE_LOG(LogTemp, Warning, TEXT("Host: %s, Port: %i"), *(addr->ToString(true)), port);
 	//SendMessage();
 }
 
 void ATCPSocket::AcceptClient()
 {
-	if (clientSocket) {
-		clientSocket = Socket->Accept(TEXT("Connected to client.:"));
-		UE_LOG(LogTemp, Debug, TEXT("Client connected."));
-	} else {
-		UE_LOG(LogTemp, Warning, TEXT("No client connected."));
-	}
+	socketThread = FSocketThread::JoyInit(socket);
+	//if (clientSocket) {
+	//	clientSocket = Socket->Accept(TEXT("Connected to client.:"));
+	//	UE_LOG(LogTemp, Warning, TEXT("Client connected."));
+	//} else {
+	//	UE_LOG(LogTemp, Warning, TEXT("No client connected."));
+	//}
+}
+
+void ATCPSocket::ShutdownSocket()
+{
+	FSocketThread::Shutdown();
 }
 
 void ATCPSocket::SendMessage()
@@ -66,6 +80,6 @@ void ATCPSocket::SendMessage()
 	int32 size = FCString::Strlen(serializedChar);
 	int32 sent = 0;
 
-	bool successful = Socket->Send((uint8*)TCHAR_TO_UTF8(serializedChar), size, sent);
+	bool successful = socket->Send((uint8*)TCHAR_TO_UTF8(serializedChar), size, sent);
 }
 

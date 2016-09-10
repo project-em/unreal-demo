@@ -4,6 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "Networking.h"
+#include "SocketThread.h"
 #include "TCPSocket.generated.h"
 
 UCLASS()
@@ -17,6 +18,10 @@ public:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+
+	// Called when the game ends or when destroyed
+	virtual void BeginDestroy() override;
 	
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
@@ -29,6 +34,9 @@ public:
 
 	UFUNCTION(BLueprintCallable, Category = "Socket")
 	void AcceptClient();
+
+	UFUNCTION(BLueprintCallable, Category = "Socket")
+	void ShutdownSocket();
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Socket")
 	int32 port;
@@ -36,8 +44,15 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Socket")
 	FString address;
 
-	FSocket* Socket;
-	FSocket *clientSocket;
+	FSocket* socket;
+	FSocketThread* socketThread;
+	TArray<uint32> PrimeNumbers;
+
+	FRunnableThread* Thread;
+
+
+	/** Stop this thread? Uses Thread Safe Counter */
+	FThreadSafeCounter StopTaskCounter;
 	
 	
 };
