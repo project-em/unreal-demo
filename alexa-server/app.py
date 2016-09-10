@@ -55,3 +55,6 @@ def answer(first, second, third):
     else:
         msg = render_template('lose')
     return statement(msg)
+
+if __name__ == '__main__':
+    app.run(debug=True)
