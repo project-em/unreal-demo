@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, request
 from unreal_socket import UnrealSocket
+import sys
 
 app = Flask(__name__)
 
@@ -7,13 +8,18 @@ app = Flask(__name__)
 def hello_world():
     return 'Hello, World!'
 
+def p(*args):
+  print args[0] % (len(args) > 1 and args[1:] or [])
+  sys.stdout.flush()
+
 # Step 1
 @app.route('/register', methods=['POST'])
 def register_client():
     host = request.json['host']
     port = request.json['port']
     UnrealSocket(host, port)
-
+    return 'ok'
+    
 # Step 3
 @app.route('/alexa', methods=['POST'])
 def execute_command():

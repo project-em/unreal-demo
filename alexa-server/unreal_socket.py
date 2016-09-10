@@ -1,5 +1,6 @@
 import threading
 import socket
+import heroku_logger
 # from alexa import Alexa
 
 class UnrealCommand(object):
@@ -23,12 +24,12 @@ class UnrealSocket(object):
         self.host = host
         self.port = port
         self.thread = threading.Thread(target=self.connect)
-        threads.append(self.thread)
+        UnrealSocket.threads.append(self.thread)
         self.thread.start()
 
     def connect(self):
-        active_socket = socket.socket(AF_INET, SOCK_STREAM)
-        active_socket.connect(self.host, self.port)
+        active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        active_socket.connect((self.host, self.port))
     
     def process_command(self, api_route, params=[]):
         params.append('[end]')
