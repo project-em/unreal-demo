@@ -43,6 +43,7 @@ uint32 FSocketThread::Run()
 		num++;
 		if (num % 10000 == 0)
 			UE_LOG(LogTemp, Warning, TEXT("num %i"), num);
+		//ReceivedAlexaEvent.Broadcast(num);
 	}
 
 	return 0;
@@ -80,6 +81,7 @@ void FSocketThread::Shutdown()
 		Runnable = NULL;
 	}
 }
+
 
 //bool FSocketThread::IsThreadFinished()
 //{

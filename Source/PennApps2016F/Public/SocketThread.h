@@ -36,7 +36,6 @@ public:
 	void EnsureCompletion();
 
 
-
 	//~~~ Starting and Stopping Thread ~~~
 
 
@@ -52,5 +51,6 @@ public:
 	static void Shutdown();
 
 	static bool IsThreadFinished();
+
 
 };

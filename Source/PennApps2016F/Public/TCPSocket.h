@@ -7,6 +7,7 @@
 #include "SocketThread.h"
 #include "TCPSocket.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAlexaEvent, int32, event_id);
 UCLASS()
 class PENNAPPS2016F_API ATCPSocket : public AActor
 {
@@ -45,14 +46,18 @@ public:
 	FString address;
 
 	FSocket* socket;
+
 	FSocketThread* socketThread;
 	TArray<uint32> PrimeNumbers;
 
-	FRunnableThread* Thread;
+	//FRunnableThread* Thread;
 
 
-	/** Stop this thread? Uses Thread Safe Counter */
-	FThreadSafeCounter StopTaskCounter;
+	///** Stop this thread? Uses Thread Safe Counter */
+	//FThreadSafeCounter StopTaskCounter;
 	
-	
+
+
+	UPROPERTY(BlueprintAssignable)
+	FAlexaEvent ReceivedAlexaEvent;
 };
