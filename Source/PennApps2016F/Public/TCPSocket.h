@@ -27,6 +27,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Socket")
 	void SendMessage();
 
+	UFUNCTION(BLueprintCallable, Category = "Socket")
+	void AcceptClient();
+	
 	UPROPERTY(BlueprintReadWrite, Category = "Socket")
 	int32 port;
 
@@ -34,7 +37,7 @@ public:
 	FString address;
 
 	FSocket* Socket;
-
+	FSocket *clientSocket;
 	
 	
 };

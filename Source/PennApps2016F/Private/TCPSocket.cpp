@@ -30,22 +30,33 @@ void ATCPSocket::Tick( float DeltaTime )
 void ATCPSocket::CreateSocket()
 {
 	Socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("default"), false);
-
 	address = TEXT("158.130.163.72");
 	// local ip address: 158.130.160.251
 	// port 5000
 	//int32 port = 19834;
-	FIPv4Address ip;
-	FIPv4Address::Parse(address, ip);
-
-
-	TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
-	addr->SetIp(ip.Value);
+	// FIPv4Address ip;
+	// FIPv4Address::Parse(address, ip);
+	bool canBind;
+	TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(LogTemp, canBind);
+	// addr->SetIp(ip.Value);
 	port = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->BindNextPort(Socket, *addr, 1000, 1);
-	addr->SetPort(port);
-	bool connected = Socket->Connect(*addr);
-	UE_LOG(LogTemp, Warning, TEXT("Port: %i, connected: %d"), port, connected);
+	// addr->SetPort(port);
+	// Socket->Bind(*addr);
+	Socket->Listen(1);
+	FInternetAddr tempAddr;
+	Socket->GetAddress(tempAddr);
+	UE_LOG(LogTemp, Warning, TEXT("Host: %s, Port: %i, connected: %d"), tempAddr.ToString(), port, connected);
 	//SendMessage();
+}
+
+void ATCPSocket::AcceptClient()
+{
+	if (clientSocket) {
+		clientSocket = Socket->Accept(TEXT("Connected to client.:"));
+		UE_LOG(LogTemp, Debug, TEXT("Client connected."));
+	} else {
+		UE_LOG(LogTemp, Warning, TEXT("No client connected."));
+	}
 }
 
 void ATCPSocket::SendMessage()
