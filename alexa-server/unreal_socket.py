@@ -1,6 +1,6 @@
 import threading
 import socket
-from alexa import Alexa
+# from alexa import Alexa
 
 class UnrealCommand(object):
 
@@ -11,7 +11,7 @@ class UnrealCommand(object):
             return Pickup
         elif api_route == 'foo':
             return Pickup
-        else
+        else:
             return -1
 
 class UnrealSocket(object):
@@ -36,7 +36,7 @@ class UnrealSocket(object):
         # Step 5
         (command, params) = parse_command(self.recv(1024))
         # Step 6
-        Alexa.execute(command, params)
+        # Alexa.execute(command, params)
 
     def parse_command(return_date):
         split_data = return_date.split(' ')
