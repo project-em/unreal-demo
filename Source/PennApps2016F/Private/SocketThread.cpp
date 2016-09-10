@@ -21,7 +21,6 @@ FSocketThread::~FSocketThread()
 	Thread = NULL;
 }
 
-//Init
 bool FSocketThread::Init()
 {
 	//Init the Data 
@@ -29,22 +28,24 @@ bool FSocketThread::Init()
 	return true;
 }
 
-//Run
 uint32 FSocketThread::Run()
 {
 	//Initial wait before starting
 	FPlatformProcess::Sleep(0.03);
-
-	int32 num = 0;
+	TArray<uint8> buf;
+	int32 bytesRead = 0;
 	while (StopTaskCounter.GetValue() == 0)
 	{
-		//PrimeNumbers->Add(FindNextPrimeNumber());
-		//PrimesFoundCount++;
-		num++;
-		if (num % 10000 == 0)
-			UE_LOG(LogTemp, Warning, TEXT("num %i"), num);
+		// block till you get some shit
+		if (!socket) return 1;
+		socket.recv(buf.GetData(), buf.Num(), bytesRead);
+		if (bytesRead < 2) {
+			UE_LOG(LogTemp, Error, TEXT("Socket did not receive enough data."));
+			return 1;
+		}
+		int32 command = buf[0];
+		// call custom event with number here
 	}
-
 	return 0;
 }
 
@@ -52,6 +53,15 @@ uint32 FSocketThread::Run()
 void FSocketThread::Stop()
 {
 	StopTaskCounter.Increment();
+}
+
+FString FSocketThread::StringFromBinaryArray(const TArray<uint8>& BinaryArray)
+{
+	//Create a string from a byte array!
+	const std::string cstr( reinterpret_cast<const char*>(BinaryArray.GetData()), BinaryArray.Num() );
+ 
+	//FString can take in the c_str() of a std::string
+	return FString(cstr.c_str());
 }
 
 FSocketThread* FSocketThread::JoyInit(FSocket* socket)
