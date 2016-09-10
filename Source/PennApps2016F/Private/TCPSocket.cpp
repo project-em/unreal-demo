@@ -37,7 +37,7 @@ void ATCPSocket::CreateSocket()
 	// FIPv4Address ip;
 	// FIPv4Address::Parse(address, ip);
 	bool canBind;
-	TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(LogTemp, canBind);
+	TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(AlexaLogger, canBind);
 	// addr->SetIp(ip.Value);
 	port = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->BindNextPort(Socket, *addr, 1000, 1);
 	// addr->SetPort(port);
