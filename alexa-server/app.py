@@ -1,7 +1,10 @@
 from flask import Flask, request, render_template
 from flask_ask import Ask, statement, question, session
+from json import dumps
 from unreal_socket import UnrealSocket
 from random import randint, choice
+
+import requests
 import sys
 import logging
 
@@ -29,7 +32,11 @@ def register_client():
 def execute_command():
     command_name = request.json['command']
     # Step 4
-    UnrealSocket.active_socket.process_command(command_name)
+    if(UnrealSocket.active_socket):
+        UnrealSocket.active_socket.process_command(command_name)
+        return 'OK'
+    else:
+        return 'Nope'
 
 @ask.launch
 def new_game():
