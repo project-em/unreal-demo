@@ -12,10 +12,6 @@ ask = Ask(app, "/")
 
 logging.getLogger("flask_ask").setLevel(logging.DEBUG)
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
-
 def p(*args):
   print args[0] % (len(args) > 1 and args[1:] or [])
   sys.stdout.flush()
