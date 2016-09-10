@@ -1,7 +1,16 @@
-welcome: Welcome to memory game. I'm going to say three numbers for you to repeat backwards. Ready?
+welcome: |
+  <speak>
+      Help, help, I don't know where I am
+  </speak>
+
+press: I pressed the {{ buttonMsg }} button
+
+query: I see {{ queryStr }}
+
+locate: I don't know where I am, but I see {{ queryStr }}
 
 round: Can you repeat the numbers {{ numbers|join(", ") }} backwards?
 
-win: Good job!
+about: Um, {{ aboutStr }}
 
-lose: Sorry, that's the wrong answer.
+quit: Please don't leave me...
