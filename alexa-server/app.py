@@ -1,15 +1,15 @@
 from flask import Flask, request, render_template
-import logging
-from random import randint
-
 from flask_ask import Ask, statement, question, session
 from unreal_socket import UnrealSocket
+from random import randint
 import sys
+import logging
 
 app = Flask(__name__)
 
 ask = Ask(app, "/")
 
+app.debug = True
 logging.getLogger("flask_ask").setLevel(logging.DEBUG)
 
 def p(*args):
