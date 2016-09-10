@@ -1,6 +1,7 @@
 import threading
 import socket
-import heroku_logger
+from heroku_logger import p
+import time
 # from alexa import Alexa
 
 class UnrealCommand(object):
@@ -15,17 +16,40 @@ class UnrealSocket(object):
     threads = []
     active_socket = None
 
+    def cleanup():
+        if active_socket:
+            active_socket.exit()
+
     def __init__(self, host, port):
         self.host = host
         self.port = port
+        self.queued_commands = []
+        self.exit = False
         self.thread = threading.Thread(target=self.connect)
-        UnrealSocket.threads.append(self.thread)
+        UnrealSocket.active_socket = self
         self.thread.start()
 
     def connect(self):
+        # TEST
+        self.queued_commands = ['1']
+        # END TEST
         active_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        p("Socket Created.")
         active_socket.connect((self.host, self.port))
-    
+        p("Socket Connected")
+        while 1:
+            if self.exit:
+                self.thread.exit(0)
+            elif len(self.queued_commands) == 0:
+                time.sleep(0.01)
+            else:
+                command = self.queued_commands.pop()
+                active_socket.send(command)
+                p('Sent {0} to {1}:{2}'.format(command, self.host, self.port))
+
+    def exit(self):
+        self.exit = True
+
     def process_command(self, command):
-        active_socket.send('{0}\n'.format(command))
+        self.queued_commands.push('{0}\n'.format(str(command)))
         # Step 5 and 6 are done via rest call

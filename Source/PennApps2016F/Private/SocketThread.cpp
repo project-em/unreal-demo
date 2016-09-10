@@ -28,8 +28,10 @@ FSocketThread::~FSocketThread()
 
 bool FSocketThread::Init()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Prime Number Thread Started!"));
+	UE_LOG(LogTemp, Warning, TEXT("Socket running on %d"), socket->GetPortNo());
 	clientSocket = socket->Accept(TEXT("Connected to client.:"));
+	if (clientSocket)
+		UE_LOG(LogTemp, Warning, TEXT("Connected to client running on %d"), clientSocket->GetPortNo());
 	return clientSocket != NULL;
 }
 
@@ -39,13 +41,16 @@ uint32 FSocketThread::Run()
 	FPlatformProcess::Sleep(0.03);
 	TArray<uint8> buf;
 	int32 bytesRead = 0;
+	uint32 pendingDataSize = 0;
 	while (StopTaskCounter.GetValue() == 0)
 	{
 		// block till you get some shit
-		if (!socket) return 1;
-		socket->Recv(buf.GetData(), buf.Num(), bytesRead);
-		if (bytesRead < 2) {
-			UE_LOG(LogTemp, Error, TEXT("Socket did not receive enough data."));
+		if (!clientSocket) return 1;
+		if (!clientSocket->HasPendingData(pendingDataSize)) continue;
+		buf.Init(0, pendingDataSize);
+		clientSocket->Recv(buf.GetData(), buf.Num(), bytesRead);	
+		if (bytesRead < 1) {
+			UE_LOG(LogTemp, Error, TEXT("Socket did not receive enough data: %d"), bytesRead);
 			return 1;
 		}
 		int32 command = buf[0];

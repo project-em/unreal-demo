@@ -28,15 +28,13 @@ def register_client():
 @app.route('/alexa', methods=['POST'])
 def execute_command():
     command_name = request.json['command']
-    params = request.json['params']
     # Step 4
-    UnrealSocket.active_socket.process_command(command_name, params)
+    UnrealSocket.active_socket.process_command(command_name)
 
 @ask.launch
 def new_game():
     welcome_msg = render_template('welcome')
     return question(welcome_msg)
-
 
 @ask.intent("PressButtonIntent", convert = {'color': str})
 def press_button(color):
@@ -71,6 +69,18 @@ def about_self():
             'You tell me. What do you think?']
     )
     return question(render_template('about', aboutStr = about_str))
+
+def shutdown_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    shutdown_server()
+    UnrealSocket.cleanup()
+    return 'Server shutting down...'
 
 if __name__ == '__main__':
     app.run(debug=True)
