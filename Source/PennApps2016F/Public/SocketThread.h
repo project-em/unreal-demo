@@ -9,7 +9,7 @@
 class PENNAPPS2016F_API FSocketThread : public FRunnable
 {
 	/** Singleton instance, can access the thread any time via static accessor, if it is active! */
-	static  FSocketThread* Runnable;
+	static FSocketThread* Runnable;
 
 	/** Thread to run the worker FRunnable on */
 	FRunnableThread* Thread;

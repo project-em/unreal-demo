@@ -7,8 +7,6 @@
 FSocketThread* FSocketThread::Runnable = NULL;
 FSocketThread* FSocketThread::Singleton(FSocket* socket)
 {
-	//Create new instance of thread if it does not exist
-	//		and the platform supports multi threading!
 	if (!Runnable && FPlatformProcess::SupportsMultithreading())
 	{
 		Runnable = new FSocketThread(socket);
