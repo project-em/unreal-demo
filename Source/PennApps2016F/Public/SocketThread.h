@@ -17,8 +17,8 @@ class PENNAPPS2016F_API FSocketThread : public FRunnable
 	/** Stop this thread? Uses Thread Safe Counter */
 	FThreadSafeCounter StopTaskCounter;
 
-	FSocket* socket;
-
+	FSocket *socket;
+	FSocket *clientSocket;
 public:
 	//~~~ Thread Core Functions ~~~
 
@@ -35,22 +35,9 @@ public:
 	/** Makes sure this thread has stopped properly */
 	void EnsureCompletion();
 
-
-
-	//~~~ Starting and Stopping Thread ~~~
-
-
-
-	/*
-	Start the thread and the worker from static (easy access)!
-	This code ensures only 1 Prime Number thread will be able to run at a time.
-	This function returns a handle to the newly started instance.
-	*/
-	static FSocketThread* JoyInit(FSocket* socket);
-
-	/** Shuts down the thread. Static so it can easily be called from outside the thread context */
+	// Singleton
+	static FSocketThread* Singleton(FSocket* socket);
 	static void Shutdown();
-
 	static bool IsThreadFinished();
 
 };

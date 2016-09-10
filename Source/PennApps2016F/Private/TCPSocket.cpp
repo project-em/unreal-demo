@@ -59,7 +59,7 @@ void ATCPSocket::CreateSocket()
 
 void ATCPSocket::AcceptClient()
 {
-	socketThread = FSocketThread::JoyInit(socket);
+	socketThread = FSocketThread::Singleton(socket);
 	//if (clientSocket) {
 	//	clientSocket = Socket->Accept(TEXT("Connected to client.:"));
 	//	UE_LOG(LogTemp, Warning, TEXT("Client connected."));

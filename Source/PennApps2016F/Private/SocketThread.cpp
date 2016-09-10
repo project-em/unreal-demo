@@ -2,11 +2,19 @@
 
 #include "PennApps2016F.h"
 #include "SocketThread.h"
-//***********************************************************
-//Thread Worker Starts as NULL, prior to being instanced
-//		This line is essential! Compiler error without it
+
+// Singleton
 FSocketThread* FSocketThread::Runnable = NULL;
-//***********************************************************
+FSocketThread* FSocketThread::Singleton(FSocket* socket)
+{
+	//Create new instance of thread if it does not exist
+	//		and the platform supports multi threading!
+	if (!Runnable && FPlatformProcess::SupportsMultithreading())
+	{
+		Runnable = new FSocketThread(socket);
+	}
+	return Runnable;
+}
 
 FSocketThread::FSocketThread(FSocket* socket)
 	: socket(socket),
@@ -23,9 +31,9 @@ FSocketThread::~FSocketThread()
 
 bool FSocketThread::Init()
 {
-	//Init the Data 
 	UE_LOG(LogTemp, Warning, TEXT("Prime Number Thread Started!"));
-	return true;
+	clientSocket = socket->Accept(TEXT("Connected to client.:"));
+	return clinetSocket != NULL;
 }
 
 uint32 FSocketThread::Run()
@@ -49,30 +57,11 @@ uint32 FSocketThread::Run()
 	return 0;
 }
 
-//stop
 void FSocketThread::Stop()
 {
 	StopTaskCounter.Increment();
-}
-
-FString FSocketThread::StringFromBinaryArray(const TArray<uint8>& BinaryArray)
-{
-	//Create a string from a byte array!
-	const std::string cstr( reinterpret_cast<const char*>(BinaryArray.GetData()), BinaryArray.Num() );
- 
-	//FString can take in the c_str() of a std::string
-	return FString(cstr.c_str());
-}
-
-FSocketThread* FSocketThread::JoyInit(FSocket* socket)
-{
-	//Create new instance of thread if it does not exist
-	//		and the platform supports multi threading!
-	if (!Runnable && FPlatformProcess::SupportsMultithreading())
-	{
-		Runnable = new FSocketThread(socket);
-	}
-	return Runnable;
+	socket->close();
+	clientSocket->close();
 }
 
 void FSocketThread::EnsureCompletion()
