@@ -6,7 +6,7 @@ public class PennApps2016F : ModuleRules
 {
 	public PennApps2016F(TargetInfo Target)
 	{
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Http", "Json", "JsonUtilities" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Http", "Json", "JsonUtilities", "Sockets", "Networking" });
 
         PrivateDependencyModuleNames.AddRange(new string[] {  });
 
