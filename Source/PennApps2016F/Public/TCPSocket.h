@@ -12,13 +12,17 @@ class PENNAPPS2016F_API ATCPSocket : public AActor
 {
 	GENERATED_BODY()
 	
+private:
+	FSocket* socket;
+	FSocketThread* socketThread;
+	FRunnableThread* Thread;
+	FThreadSafeCounter StopTaskCounter;
 public:	
 	// Sets default values for this actor's properties
 	ATCPSocket();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 
 	// Called when the game ends or when destroyed
 	virtual void BeginDestroy() override;
@@ -43,16 +47,4 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Socket")
 	FString address;
-
-	FSocket* socket;
-	FSocketThread* socketThread;
-	TArray<uint32> PrimeNumbers;
-
-	FRunnableThread* Thread;
-
-
-	/** Stop this thread? Uses Thread Safe Counter */
-	FThreadSafeCounter StopTaskCounter;
-	
-	
 };

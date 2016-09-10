@@ -17,8 +17,7 @@ FSocketThread* FSocketThread::Singleton(FSocket* socket)
 }
 
 FSocketThread::FSocketThread(FSocket* socket)
-	: socket(socket),
-	  StopTaskCounter(0)
+	: socket(socket), StopTaskCounter(0)
 {
 	Thread = FRunnableThread::Create(this, TEXT("FSocketThread"), 0, TPri_BelowNormal); //windows default = 8mb for thread, could specify more
 }
@@ -79,9 +78,3 @@ void FSocketThread::Shutdown()
 		Runnable = NULL;
 	}
 }
-
-//bool FSocketThread::IsThreadFinished()
-//{
-//	if (Runnable) return Runnable->IsFinished();
-//	return true;
-//}
