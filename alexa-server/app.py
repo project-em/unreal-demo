@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template
 from flask_ask import Ask, statement, question, session
 from unreal_socket import UnrealSocket
-from random import randint
+from random import randint, choice
 import sys
 import logging
 
