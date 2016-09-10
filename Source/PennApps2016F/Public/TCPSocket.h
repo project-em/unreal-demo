@@ -4,22 +4,25 @@
 
 #include "GameFramework/Actor.h"
 #include "Networking.h"
-#include "SocketThread.h"
 #include "TCPSocket.generated.h"
-
+class FSocketThread;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAlexaEvent, int32, event_id);
 UCLASS()
 class PENNAPPS2016F_API ATCPSocket : public AActor
 {
 	GENERATED_BODY()
 	
+private:
+	FSocket* socket;
+	FSocketThread* socketThread;
+	FRunnableThread* Thread;
+	FThreadSafeCounter StopTaskCounter;
 public:	
 	// Sets default values for this actor's properties
 	ATCPSocket();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 
 	// Called when the game ends or when destroyed
 	virtual void BeginDestroy() override;
@@ -29,9 +32,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Socket")
 	void CreateSocket();
-
-	UFUNCTION(BlueprintCallable, Category = "Socket")
-	void SendMessage();
 
 	UFUNCTION(BLueprintCallable, Category = "Socket")
 	void AcceptClient();
@@ -44,19 +44,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Socket")
 	FString address;
-
-	FSocket* socket;
-
-	FSocketThread* socketThread;
-	TArray<uint32> PrimeNumbers;
-
-	//FRunnableThread* Thread;
-
-
-	///** Stop this thread? Uses Thread Safe Counter */
-	//FThreadSafeCounter StopTaskCounter;
-	
-
 
 	UPROPERTY(BlueprintAssignable)
 	FAlexaEvent ReceivedAlexaEvent;
