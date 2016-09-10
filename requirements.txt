@@ -1,1 +1,2 @@
 flask==0.11
+flask-ask==0.7.8
