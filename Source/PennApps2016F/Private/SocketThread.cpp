@@ -53,7 +53,7 @@ uint32 FSocketThread::Run()
 			UE_LOG(LogTemp, Error, TEXT("Socket did not receive enough data: %d"), bytesRead);
 			return 1;
 		}
-		int32 command = buf[0];
+		int32 command = (buf[0] - '0');
 		// call custom event with number here
 		alexaEvent->Broadcast(command);
 	}
