@@ -42,7 +42,7 @@ def register_client():
     return 'ok'
     
 # Step 3
-@app.route('/repl', methods=['POST'])
+@app.route('/alexa', methods=['POST'])
 def execute_command():
     p('test')
     p(str(app))
