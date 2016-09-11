@@ -119,7 +119,10 @@ def buildSayList(speech):
 
 @ask.intent("AnswerIntent", convert={'first': int, 'second': int, 'third': int, 'fourth': int})
 def answer(first, second, third, fourth):
-    winning_numbers = session.attributes['numbers']
+    if (session.attributes.get('numbers')):
+        winning_numbers = session.attributes['numbers']
+    else:
+        return statement(render_template('lose'))
     if [first, second, third, fourth] == winning_numbers:
         msg = render_template('win')
         p('goo')

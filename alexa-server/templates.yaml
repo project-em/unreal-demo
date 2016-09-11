@@ -29,4 +29,4 @@ win: Good job. we can finally meet
 
 lose: Let's try that again
 
-numbers: I see the numbers {{ speechStr | join(", ") }} in front of me. Try saying those out loud, maybe.
+numbers: I see the numbers {{ speechStr | join(", ") }}, in front of me. Try saying those out loud, maybe.
