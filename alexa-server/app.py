@@ -1,5 +1,7 @@
 from flask import Flask, request, render_template
 from flask_ask import Ask, statement, question, session
+# from flask.ext.cache import Cache
+from werkzeug.contrib.cache import SimpleCache
 from json import dumps
 from unreal_socket import UnrealSocket
 from random import randint, choice
@@ -11,6 +13,12 @@ import logging
 app = Flask(__name__)
 
 ask = Ask(app, "/")
+
+cache = SimpleCache()
+# cache = Cache(app,config={'CACHE_TYPE': 'simple'})
+# cache.init_app(app)
+
+# query_list = []
 
 app.debug = True
 logging.getLogger("flask_ask").setLevel(logging.DEBUG)
@@ -45,6 +53,11 @@ def new_game():
 
 @ask.intent("PressButtonIntent", convert = {'color': str})
 def press_button(color):
+    switch(color):
+        case 'red':
+        case 'blue':
+        case 'yellow':
+        case 'green'
     button_msg = render_template('press', buttonMsg = color)
     return question(button_msg)
 
@@ -54,10 +67,20 @@ def quit():
 
 @ask.intent("QueryWorldIntent")
 def query_world():
+    res = requests.post('https://e404a956.ngrok.io/alexa', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
     return question(buildQueryList(getQueryList()))
 
+@app.route('/queryResponse', methods=['POST'])
+def execute_query():
+    cache.set('query_list', request.json['query_list'])
+    
+
 def getQueryList():
-    return ['red button', 'yellow button', 'purple door', 'trung', 'max', 'sacha', 'akshay']
+    if cache.get('query_list') is not None:
+        return cache.get('query_list')
+    else:
+        p('query list is none')
+        return ['nothing yet']
 
 def buildQueryList(query_list):
     query_str = ', '.join(['a ' + x for x in query_list][:-1]) + ', and a ' + query_list[-1]
@@ -90,4 +113,4 @@ def shutdown():
     return 'Server shutting down...'
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)
