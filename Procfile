@@ -1,1 +1,1 @@
-web: gunicorn alexa-server.app:app --log-file - -w 1 
+web: gunicorn alexa-server.app:app --log-file -  
