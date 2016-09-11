@@ -15,7 +15,7 @@ FSocketThread* FSocketThread::Singleton(FSocket* socket, FAlexaEvent* alexaEvent
 }
 
 FSocketThread::FSocketThread(FSocket* socket, FAlexaEvent* alexaEvent)
-	: socket(socket), alexaEvent(alexaEvent), StopTaskCounter(0)
+	: socket(socket), alexaEvent(alexaEvent), clientSocket(nullptr), StopTaskCounter(0)
 {
 	Thread = FRunnableThread::Create(this, TEXT("FSocketThread"), 0, TPri_BelowNormal); //windows default = 8mb for thread, could specify more
 }
@@ -29,10 +29,7 @@ FSocketThread::~FSocketThread()
 bool FSocketThread::Init()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Socket running on %d"), socket->GetPortNo());
-	clientSocket = socket->Accept(TEXT("Connected to client.:"));
-	if (clientSocket)
-		UE_LOG(LogTemp, Warning, TEXT("Connected to client running on %d"), clientSocket->GetPortNo());
-	return clientSocket != NULL;
+	return true;
 }
 
 uint32 FSocketThread::Run()
@@ -42,20 +39,33 @@ uint32 FSocketThread::Run()
 	TArray<uint8> buf;
 	int32 bytesRead = 0;
 	uint32 pendingDataSize = 0;
+	bool foo;
 	while (StopTaskCounter.GetValue() == 0)
 	{
-		// block till you get some shit
-		if (!clientSocket) return 1;
-		if (!clientSocket->HasPendingData(pendingDataSize)) continue;
-		buf.Init(0, pendingDataSize);
-		clientSocket->Recv(buf.GetData(), buf.Num(), bytesRead);	
-		if (bytesRead < 1) {
-			UE_LOG(LogTemp, Error, TEXT("Socket did not receive enough data: %d"), bytesRead);
-			return 1;
+		socket->HasPendingConnection(foo);
+		while (!foo && StopTaskCounter.GetValue() == 0)
+		{
+			Sleep(1);
+			socket->HasPendingConnection(foo);
 		}
-		int32 command = (buf[0] - '0');
-		// call custom event with number here
-		alexaEvent->Broadcast(command);
+		// at this point there is a client waiting
+		clientSocket = socket->Accept(TEXT("Connected to client.:"));
+		if (clientSocket == NULL) continue;
+		while (StopTaskCounter.GetValue() == 0)
+		{
+			Sleep(1);
+			if (!clientSocket->HasPendingData(pendingDataSize)) continue;
+			buf.Init(0, pendingDataSize);
+			clientSocket->Recv(buf.GetData(), buf.Num(), bytesRead);	
+			if (bytesRead < 1) {
+				UE_LOG(LogTemp, Error, TEXT("Socket did not receive enough data: %d"), bytesRead);
+				return 1;
+			}
+			int32 command = (buf[0] - '0');
+			// call custom event with number here
+			alexaEvent->Broadcast(command);
+			clientSocket->Close();
+		}
 	}
 	return 0;
 }
@@ -63,8 +73,10 @@ uint32 FSocketThread::Run()
 void FSocketThread::Stop()
 {
 	StopTaskCounter.Increment();
-	socket->Close();
-	clientSocket->Close();
+	if (socket)
+		socket->Close();
+	if (clientSocket)
+		clientSocket->Close();
 }
 
 void FSocketThread::EnsureCompletion()

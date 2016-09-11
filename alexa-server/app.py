@@ -37,26 +37,30 @@ def p(*args):
 def register_client():
     host = request.json['host']
     port = request.json['port']
-    UnrealSocket(host, port)
-    app.sock = UnrealSocket.active_socket
+    app.sock = UnrealSocket(host, port)
     p(str(app.sock))
     return 'ok'
     
 # Step 3
 @app.route('/alexa', methods=['POST'])
 def execute_command():
-    command_name = request.json['command']
     p('test')
     p(str(app))
     p(str(app.sock))
     # Step 4
     if app.sock:
-        app.sock.process_command(command_name)
+        app.sock.command_name = request.json['command']
+        thread = threading.Thread(target=execute_inner)
+        thread.daemon = True
+        thread.start()
         p('ok')
         return 'OK'
     else:
         p('shit')
         return 'Nope'
+
+def execute_inner():
+    app.sock.process_command()
 
 @ask.launch
 def new_game():
