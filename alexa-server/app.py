@@ -53,11 +53,10 @@ def new_game():
 
 @ask.intent("PressButtonIntent", convert = {'color': str})
 def press_button(color):
-    switch(color):
-        case 'red':
-        case 'blue':
-        case 'yellow':
-        case 'green'
+    if (color == 'red'): res = requests.post('https://alexa-unreal.herokuapp.com/alexa', data = dumps({'command' : 1}), headers = {'content-type' : 'application/json'})
+    elif(color == 'blue'): res = requests.post('https://alexa-unreal.herokuapp.com/alexa', data = dumps({'command' : 2}), headers = {'content-type' : 'application/json'})
+    elif(color == 'green'): res = requests.post('https://alexa-unreal.herokuapp.com/alexa', data = dumps({'command' : 3}), headers = {'content-type' : 'application/json'})
+    elif(color == 'yellow'): res = requests.post('https://alexa-unreal.herokuapp.com/alexa', data = dumps({'command' : 4}), headers = {'content-type' : 'application/json'})
     button_msg = render_template('press', buttonMsg = color)
     return question(button_msg)
 
@@ -67,7 +66,7 @@ def quit():
 
 @ask.intent("QueryWorldIntent")
 def query_world():
-    res = requests.post('https://alexa-unreal.herokuapp.com', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
+    res = requests.post('https://alexa-unreal.herokuapp.com/alexa', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
     return question(buildQueryList(getQueryList()))
 
 @app.route('/queryResponse', methods=['POST'])
@@ -88,6 +87,7 @@ def buildQueryList(query_list):
 
 @ask.intent("LocationIntent")
 def locate_surounding():
+    res = requests.post('https://alexa-unreal.herokuapp.com/alexa', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
     return question(buildQueryList(getQueryList()))
 
 @ask.intent("NameIntent")
