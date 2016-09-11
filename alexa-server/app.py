@@ -47,6 +47,7 @@ def register_client():
 def execute_command():
     command_name = request.json['command']
     p('test')
+    p(str(app))
     p(str(app.sock))
     # Step 4
     if app.sock:
