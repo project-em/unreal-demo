@@ -49,5 +49,6 @@ class UnrealSocket(object):
         self.exit = True
 
     def process_command(self, command):
+        p('Queued command: {0}'.format(str(command)))
         self.queued_commands.put('{0}\n'.format(str(command)), True)
         # Step 5 and 6 are done via rest call

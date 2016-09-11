@@ -21,7 +21,7 @@ cache = SimpleCache()
 # query_list = []
 
 app.debug = True
-logging.getLogger("flask_ask").setLevel(logging.DEBUG)
+# logging.getLogger("flask_ask").setLevel(logging.ERROR)
 
 def p(*args):
   print args[0] % (len(args) > 1 and args[1:] or [])
