@@ -38,7 +38,7 @@ class UnrealSocket(object):
         while 1:
             if self.exit:
                 self.thread.exit(0)
-            elif len(self.queued_commands) == 0:
+            elif self.queued_commands.qsize() == 0:
                 time.sleep(0.01)
             else:
                 command = self.queued_commands.get(True)
