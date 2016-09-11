@@ -40,7 +40,7 @@ def register_client():
 def execute_command():
     command_name = request.json['command']
     # Step 4
-    if(UnrealSocket.active_socket):
+    if UnrealSocket.active_socket:
         UnrealSocket.active_socket.process_command(command_name)
         return 'OK'
     else:
