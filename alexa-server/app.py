@@ -10,7 +10,7 @@ from werkzeug.serving import WSGIRequestHandler
 import requests
 import sys
 import logging
-
+import threading
 app = Flask(__name__)
 
 ask = Ask(app, "/")
@@ -21,12 +21,12 @@ cache = SimpleCache()
 
 # query_list = []
 
-ROOT_URL = 'https://alexa-unreal.herokuapp.com'
+ROOT_URL = 'https://7694f564.ngrok.io'
 
 app.debug = True
 app.threaded = True
+WSGIRequestHandler.protocol_version = "HTTP/1.1"
 logging.getLogger("flask_ask").setLevel(logging.ERROR)
-
 app.sock = None
 
 def p(*args):
@@ -52,8 +52,10 @@ def execute_command():
     # Step 4
     if app.sock:
         app.sock.process_command(command_name)
+        p('ok')
         return 'OK'
     else:
+        p('shit')
         return 'Nope'
 
 @ask.launch
@@ -77,9 +79,14 @@ def quit():
 @ask.intent("QueryWorldIntent")
 def query_world():
     p('foo')
+    thread = threading.Thread(target=stupid_thread)
+    thread.daemon = True
+    thread.start()
+    return question(buildQueryList(getQueryList()))
+
+def stupid_thread():
     res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 0}), headers = 
         {'content-type' : 'application/json', 'Connection': 'Keep-alive'})
-    return question(buildQueryList(getQueryList()))
 
 @app.route('/queryResponse', methods=['POST'])
 def execute_query():
@@ -125,5 +132,4 @@ def shutdown():
     return 'Server shutting down...'
 
 if __name__ == '__main__':
-    WSGIRequestHandler.protocol_version = "HTTP/1.1"
-    app.run(debug=True, threaded=True, port=443)
+    app.run(debug=True)
