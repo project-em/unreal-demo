@@ -21,7 +21,7 @@ cache = SimpleCache()
 
 # query_list = []
 
-ROOT_URL = 'https://e94b3c5b.ngrok.io'
+ROOT_URL = 'https://21d90dbc.ngrok.io'
 app.debug = True
 app.threaded = True
 WSGIRequestHandler.protocol_version = "HTTP/1.1"
@@ -95,9 +95,40 @@ def query_world():
     thread.start()
     return question(buildQueryList(getQueryList()))
 
+@ask.intent("NumberIntent")
+def number_query():
+    p('goo')
+    thread = threading.Thread(target=stupid_thread_3)
+    thread.daemon = True
+    thread.start()
+    return question(buildSayList(getSpeech()))
+
 def stupid_thread():
     res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 0}), headers = 
         {'content-type' : 'application/json'})
+
+def stupid_thread_3():
+    res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 5}), headers =
+        {'content-type' : 'application/json'})
+
+@app.route('/say', methods=['POST'])
+def execute_random():
+    cache.set('speech', request.json['speech'])
+    return 'ok'
+
+def buildSayList(speech):
+    numbers = [randint(0, 9) for _ in range(4)]
+    session.attributes['numbers'] = numbers
+    return render_template('numbers', speechStr = numbers)
+
+@ask.intent("AnswerIntent", convert={'first': int, 'second': int, 'third': int, 'fourth': int})
+def answer(first, second, third, fourth):
+    winning_numbers = session.attributes['numbers']
+    if [first, second, third, fourth] == winning_numbers:
+        msg = render_template('win')
+    else:
+        msg = render_template('lose')
+    return statement(msg)
 
 @app.route('/queryResponse', methods=['POST'])
 def execute_query():
@@ -109,6 +140,13 @@ def getQueryList():
         return cache.get('query_list')
     else:
         p('query list is none')
+        return ['nothing yet']
+
+def getSpeech():
+    if cache.get('speech') is not None:
+        return cache.get('speech')
+    else:
+        p('speech is none')
         return ['nothing yet']
 
 def buildQueryList(query_list):
@@ -129,6 +167,50 @@ def about_self():
             'You tell me. What do you think?']
     )
     return question(render_template('about', aboutStr = about_str))
+
+@ask.intent("ComplimentIntent")
+def compliment():
+    compliment_str = choice(
+            ['Thank you', 
+            'No problem' , 
+            'We make a good team',
+            'Any time']
+    )
+    return statement(render_template('compliment', complimentStr = compliment_str))
+
+@ask.intent("RomanceIntent")
+def romance():
+    romance_str = choice(
+    ["Lets get out of here first",
+    "Can we focus please",
+    "I am blushing"]
+    )
+    return question(render_template('romance', romanceStr = romance_str))
+
+@ask.intent("WellnessIntent")
+def wellness():
+    wellness_str = choice(
+    ["I am a little lost",
+    "I am okay, but want to find you",
+    "Lets just figure this out"]
+    )
+    return question(render_template('wellness', wellnessStr = wellness_str))
+
+@ask.intent("InstructionIntent")
+def instruction():
+    instruction_str = choice(
+    ['I cant see where you are, but check your surroundings',
+    'There are colored buttons in this room, do you see any in yours',
+    'Dont worry, we will figure this out, try to look for doors around you']
+    )
+    return question(render_template('instruction', instructionStr = instruction_str))
+
+@ask.intent("DespairIntent")
+def despair():
+    despair_str = choice(
+    ['everything is gonna be okay']
+    )
+    return question(render_template('despair', despairStr = despair_str))
 
 def shutdown_server():
     func = request.environ.get('werkzeug.server.shutdown')
