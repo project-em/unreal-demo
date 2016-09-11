@@ -21,7 +21,7 @@ cache = SimpleCache()
 
 # query_list = []
 
-ROOT_URL = 'https://alexa2-unreal.herokuapp.com'
+ROOT_URL = 'https://e94b3c5b.ngrok.io'
 app.debug = True
 app.threaded = True
 WSGIRequestHandler.protocol_version = "HTTP/1.1"
@@ -69,12 +69,19 @@ def new_game():
 
 @ask.intent("PressButtonIntent", convert = {'color': str})
 def press_button(color):
-    if (color == 'red'): res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 1}), headers = {'content-type' : 'application/json'})
-    elif(color == 'blue'): res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 2}), headers = {'content-type' : 'application/json'})
-    elif(color == 'green'): res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 3}), headers = {'content-type' : 'application/json'})
-    elif(color == 'yellow'): res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 4}), headers = {'content-type' : 'application/json'})
+    command = 0
+    if (color == 'red'): command = 1
+    elif(color == 'blue'): command = 2
+    elif(color == 'green'): command = 3
+    elif(color == 'yellow'): command = 4
+    thread = threading.Thread(target=stupid_thread_2, args=[command])
+    thread.daemon = True
+    thread.start()
     button_msg = render_template('press', buttonMsg = color)
     return question(button_msg)
+
+def stupid_thread_2(command):
+    res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : command}), headers = {'content-type' : 'application/json'})
 
 @ask.intent("QuitIntent")
 def quit():
@@ -90,7 +97,7 @@ def query_world():
 
 def stupid_thread():
     res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 0}), headers = 
-        {'content-type' : 'application/json', 'Connection': 'Keep-alive'})
+        {'content-type' : 'application/json'})
 
 @app.route('/queryResponse', methods=['POST'])
 def execute_query():

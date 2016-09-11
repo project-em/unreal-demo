@@ -65,6 +65,7 @@ uint32 FSocketThread::Run()
 			// call custom event with number here
 			alexaEvent->Broadcast(command);
 			clientSocket->Close();
+			break; // go back to wait state
 		}
 	}
 	return 0;

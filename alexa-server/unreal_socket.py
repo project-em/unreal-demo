@@ -57,8 +57,7 @@ class UnrealSocket(object):
         active_socket.connect((self.host, self.port))
         p("Socket Connected")
         p('Queued command: {0}'.format(str(command)))
-        self.queued_commands.put('{0}\n'.format(str(command)), True)
-        command = self.queued_commands.get(True)
-        active_socket.send(command)
+        active_socket.send(str(command))
+        p('Send command: {0}'.format(str(command)))
         active_socket.close()
         # Step 5 and 6 are done via rest call
