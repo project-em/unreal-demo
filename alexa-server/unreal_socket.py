@@ -2,7 +2,7 @@ import threading
 import socket
 from heroku_logger import p
 import time
-import Queue
+from Queue import Queue
 # from alexa import Alexa
 
 class UnrealCommand(object):
