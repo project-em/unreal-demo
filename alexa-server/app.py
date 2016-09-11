@@ -21,8 +21,7 @@ cache = SimpleCache()
 
 # query_list = []
 
-ROOT_URL = 'https://7694f564.ngrok.io'
-
+ROOT_URL = 'https://alexa-unreal.herokuapp.com'
 app.debug = True
 app.threaded = True
 WSGIRequestHandler.protocol_version = "HTTP/1.1"
