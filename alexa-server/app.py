@@ -21,7 +21,7 @@ cache = SimpleCache()
 
 # query_list = []
 
-ROOT_URL = 'https://21d90dbc.ngrok.io'
+ROOT_URL = 'https://a09a8ab3.ngrok.io'
 app.debug = True
 app.threaded = True
 WSGIRequestHandler.protocol_version = "HTTP/1.1"
@@ -98,17 +98,13 @@ def query_world():
 @ask.intent("NumberIntent")
 def number_query():
     p('goo')
-    thread = threading.Thread(target=stupid_thread_3)
+    thread = threading.Thread(target=stupid_thread_2, args=[5])
     thread.daemon = True
     thread.start()
     return question(buildSayList(getSpeech()))
 
 def stupid_thread():
     res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 0}), headers = 
-        {'content-type' : 'application/json'})
-
-def stupid_thread_3():
-    res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 5}), headers =
         {'content-type' : 'application/json'})
 
 @app.route('/say', methods=['POST'])
@@ -123,9 +119,16 @@ def buildSayList(speech):
 
 @ask.intent("AnswerIntent", convert={'first': int, 'second': int, 'third': int, 'fourth': int})
 def answer(first, second, third, fourth):
-    winning_numbers = session.attributes['numbers']
+    if (session.attributes.get('numbers')):
+        winning_numbers = session.attributes['numbers']
+    else:
+        return statement(render_template('lose'))
     if [first, second, third, fourth] == winning_numbers:
         msg = render_template('win')
+        p('goo')
+        thread = threading.Thread(target=stupid_thread_2, args=[6])
+        thread.daemon = True
+        thread.start()
     else:
         msg = render_template('lose')
     return statement(msg)
@@ -155,7 +158,10 @@ def buildQueryList(query_list):
 
 @ask.intent("LocationIntent")
 def locate_surounding():
-    res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
+    p('goo')
+    thread = threading.Thread(target=stupid_thread_2, args=[0])
+    thread.daemon = True
+    thread.start()
     return question(buildQueryList(getQueryList()))
 
 @ask.intent("NameIntent")
@@ -176,7 +182,7 @@ def compliment():
             'We make a good team',
             'Any time']
     )
-    return statement(render_template('compliment', complimentStr = compliment_str))
+    return question(render_template('compliment', complimentStr = compliment_str))
 
 @ask.intent("RomanceIntent")
 def romance():

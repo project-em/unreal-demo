@@ -7,7 +7,7 @@ press: I pressed the {{ buttonMsg }} button
 
 query: I see {{ queryStr }}
 
-locate: I see {{ queryStr }}
+locate: hmm I see {{ queryStr }}
 
 round: Can you repeat the numbers {{ numbers|join(", ") }} backwards?
 
@@ -29,4 +29,4 @@ win: Good job. we can finally meet
 
 lose: Let's try that again
 
-numbers: I see the numbers {{ speechStr | join(", ") }} in front of me. Try saying those out loud, maybe.
+numbers: I see the numbers {{ speechStr | join(", ") }}, in front of me. Try saying those out loud, maybe.
