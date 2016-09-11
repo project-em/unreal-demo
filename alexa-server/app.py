@@ -1,15 +1,16 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, g
 from flask_ask import Ask, statement, question, session
 # from flask.ext.cache import Cache
 from werkzeug.contrib.cache import SimpleCache
 from json import dumps
 from unreal_socket import UnrealSocket
 from random import randint, choice
+from werkzeug.serving import WSGIRequestHandler
 
 import requests
 import sys
 import logging
-
+import threading
 app = Flask(__name__)
 
 ask = Ask(app, "/")
@@ -20,8 +21,12 @@ cache = SimpleCache()
 
 # query_list = []
 
+ROOT_URL = 'https://alexa2-unreal.herokuapp.com'
 app.debug = True
-# logging.getLogger("flask_ask").setLevel(logging.ERROR)
+app.threaded = True
+WSGIRequestHandler.protocol_version = "HTTP/1.1"
+logging.getLogger("flask_ask").setLevel(logging.ERROR)
+app.sock = None
 
 def p(*args):
   print args[0] % (len(args) > 1 and args[1:] or [])
@@ -32,19 +37,30 @@ def p(*args):
 def register_client():
     host = request.json['host']
     port = request.json['port']
-    UnrealSocket(host, port)
+    app.sock = UnrealSocket(host, port)
+    p(str(app.sock))
     return 'ok'
     
 # Step 3
 @app.route('/alexa', methods=['POST'])
 def execute_command():
-    command_name = request.json['command']
+    p('test')
+    p(str(app))
+    p(str(app.sock))
     # Step 4
-    if UnrealSocket.active_socket:
-        UnrealSocket.active_socket.process_command(command_name)
+    if app.sock:
+        app.sock.command_name = request.json['command']
+        thread = threading.Thread(target=execute_inner)
+        thread.daemon = True
+        thread.start()
+        p('ok')
         return 'OK'
     else:
+        p('shit')
         return 'Nope'
+
+def execute_inner():
+    app.sock.process_command()
 
 @ask.launch
 def new_game():
@@ -53,10 +69,10 @@ def new_game():
 
 @ask.intent("PressButtonIntent", convert = {'color': str})
 def press_button(color):
-    if (color == 'red'): res = requests.post('https://alexa-unreal.herokuapp.com/alexa', data = dumps({'command' : 1}), headers = {'content-type' : 'application/json'})
-    elif(color == 'blue'): res = requests.post('https://alexa-unreal.herokuapp.com/alexa', data = dumps({'command' : 2}), headers = {'content-type' : 'application/json'})
-    elif(color == 'green'): res = requests.post('https://alexa-unreal.herokuapp.com/alexa', data = dumps({'command' : 3}), headers = {'content-type' : 'application/json'})
-    elif(color == 'yellow'): res = requests.post('https://alexa-unreal.herokuapp.com/alexa', data = dumps({'command' : 4}), headers = {'content-type' : 'application/json'})
+    if (color == 'red'): res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 1}), headers = {'content-type' : 'application/json'})
+    elif(color == 'blue'): res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 2}), headers = {'content-type' : 'application/json'})
+    elif(color == 'green'): res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 3}), headers = {'content-type' : 'application/json'})
+    elif(color == 'yellow'): res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 4}), headers = {'content-type' : 'application/json'})
     button_msg = render_template('press', buttonMsg = color)
     return question(button_msg)
 
@@ -66,13 +82,20 @@ def quit():
 
 @ask.intent("QueryWorldIntent")
 def query_world():
-    res = requests.post('https://alexa-unreal.herokuapp.com/alexa', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
+    p('foo')
+    thread = threading.Thread(target=stupid_thread)
+    thread.daemon = True
+    thread.start()
     return question(buildQueryList(getQueryList()))
+
+def stupid_thread():
+    res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 0}), headers = 
+        {'content-type' : 'application/json', 'Connection': 'Keep-alive'})
 
 @app.route('/queryResponse', methods=['POST'])
 def execute_query():
     cache.set('query_list', request.json['query_list'])
-    
+    return 'ok' 
 
 def getQueryList():
     if cache.get('query_list') is not None:
@@ -87,7 +110,7 @@ def buildQueryList(query_list):
 
 @ask.intent("LocationIntent")
 def locate_surounding():
-    res = requests.post('https://alexa-unreal.herokuapp.com/alexa', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
+    res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
     return question(buildQueryList(getQueryList()))
 
 @ask.intent("NameIntent")

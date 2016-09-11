@@ -41,7 +41,7 @@ void ATCPSocket::CreateSocket()
 	port = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->BindNextPort(socket, *addr, 1000, 1);
 	addr->SetPort(port);
 	socket->Bind(*addr);
-	socket->Listen(1);
+	socket->Listen(1000);
 	address = addr->ToString(false);
 	UE_LOG(LogTemp, Warning, TEXT("Host: %s, Port: %i"), *(addr->ToString(true)), port);
 }
