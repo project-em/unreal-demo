@@ -1,1 +1,1 @@
-web: gunicorn alexa-server.app:app --log-file -
+web: python alexa-server/app.py
