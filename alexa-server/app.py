@@ -21,6 +21,8 @@ cache = SimpleCache()
 
 # query_list = []
 
+ROOT_URL = 'https://alexa-unreal.herokuapp.com'
+
 app.debug = True
 app.threaded = True
 logging.getLogger("flask_ask").setLevel(logging.ERROR)
@@ -61,10 +63,10 @@ def new_game():
 
 @ask.intent("PressButtonIntent", convert = {'color': str})
 def press_button(color):
-    if (color == 'red'): res = requests.post('https://2871f0ed.ngrok.io/alexa', data = dumps({'command' : 1}), headers = {'content-type' : 'application/json'})
-    elif(color == 'blue'): res = requests.post('https://2871f0ed.ngrok.io/alexa', data = dumps({'command' : 2}), headers = {'content-type' : 'application/json'})
-    elif(color == 'green'): res = requests.post('https://2871f0ed.ngrok.io/alexa', data = dumps({'command' : 3}), headers = {'content-type' : 'application/json'})
-    elif(color == 'yellow'): res = requests.post('https://2871f0ed.ngrok.io/alexa', data = dumps({'command' : 4}), headers = {'content-type' : 'application/json'})
+    if (color == 'red'): res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 1}), headers = {'content-type' : 'application/json'})
+    elif(color == 'blue'): res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 2}), headers = {'content-type' : 'application/json'})
+    elif(color == 'green'): res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 3}), headers = {'content-type' : 'application/json'})
+    elif(color == 'yellow'): res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 4}), headers = {'content-type' : 'application/json'})
     button_msg = render_template('press', buttonMsg = color)
     return question(button_msg)
 
@@ -75,14 +77,14 @@ def quit():
 @ask.intent("QueryWorldIntent")
 def query_world():
     p('foo')
-    res = requests.post('https://2871f0ed.ngrok.io/alexa', data = dumps({'command' : 0}), headers = 
+    res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 0}), headers = 
         {'content-type' : 'application/json', 'Connection': 'Keep-alive'})
     return question(buildQueryList(getQueryList()))
 
 @app.route('/queryResponse', methods=['POST'])
 def execute_query():
     cache.set('query_list', request.json['query_list'])
-    
+    return 'ok' 
 
 def getQueryList():
     if cache.get('query_list') is not None:
@@ -97,7 +99,7 @@ def buildQueryList(query_list):
 
 @ask.intent("LocationIntent")
 def locate_surounding():
-    res = requests.post('https://2871f0ed.ngrok.io/alexa', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
+    res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
     return question(buildQueryList(getQueryList()))
 
 @ask.intent("NameIntent")
