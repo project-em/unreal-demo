@@ -1,13 +1,13 @@
 welcome: |
   <speak>
-      Help, help, I don't know where I am
+      Let's try finding each other
   </speak>
 
 press: I pressed the {{ buttonMsg }} button
 
 query: I see {{ queryStr }}
 
-locate: I don't know where I am, but I see {{ queryStr }}
+locate: I see {{ queryStr }}
 
 round: Can you repeat the numbers {{ numbers|join(", ") }} backwards?
 
