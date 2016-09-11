@@ -17,7 +17,6 @@ void ATCPSocket::BeginPlay()
 	Super::BeginPlay();
 
 	ReceivedAlexaEvent.Broadcast(0);
-	CreateSocket();
 }
 
 // Called when the game starts or when spawned
