@@ -22,6 +22,7 @@ cache = SimpleCache()
 
 app.debug = True
 # logging.getLogger("flask_ask").setLevel(logging.ERROR)
+sock = None
 
 def p(*args):
   print args[0] % (len(args) > 1 and args[1:] or [])
@@ -32,7 +33,8 @@ def p(*args):
 def register_client():
     host = request.json['host']
     port = request.json['port']
-    UnrealSocket(host, port)
+    global sock
+    sock = UnrealSocket(host, port)
     return 'ok'
     
 # Step 3
