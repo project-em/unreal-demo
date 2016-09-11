@@ -27,6 +27,7 @@ class UnrealSocket(object):
         self.queued_commands = Queue()
         self.exit = False
         self.thread = threading.Thread(target=self.connect)
+        self.thread.daemon = True
         UnrealSocket.active_socket = self
         self.thread.start()
 

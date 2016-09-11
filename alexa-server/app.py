@@ -1,10 +1,11 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, g
 from flask_ask import Ask, statement, question, session
 # from flask.ext.cache import Cache
 from werkzeug.contrib.cache import SimpleCache
 from json import dumps
 from unreal_socket import UnrealSocket
 from random import randint, choice
+from werkzeug.serving import WSGIRequestHandler
 
 import requests
 import sys
@@ -21,8 +22,10 @@ cache = SimpleCache()
 # query_list = []
 
 app.debug = True
-# logging.getLogger("flask_ask").setLevel(logging.ERROR)
-sock = None
+app.threaded = True
+logging.getLogger("flask_ask").setLevel(logging.ERROR)
+
+app.sock = None
 
 def p(*args):
   print args[0] % (len(args) > 1 and args[1:] or [])
@@ -33,17 +36,20 @@ def p(*args):
 def register_client():
     host = request.json['host']
     port = request.json['port']
-    global sock
-    sock = UnrealSocket(host, port)
+    UnrealSocket(host, port)
+    app.sock = UnrealSocket.active_socket
+    p(str(app.sock))
     return 'ok'
     
 # Step 3
 @app.route('/alexa', methods=['POST'])
 def execute_command():
     command_name = request.json['command']
+    p('test')
+    p(str(app.sock))
     # Step 4
-    if UnrealSocket.active_socket:
-        UnrealSocket.active_socket.process_command(command_name)
+    if app.sock:
+        app.sock.process_command(command_name)
         return 'OK'
     else:
         return 'Nope'
@@ -68,7 +74,9 @@ def quit():
 
 @ask.intent("QueryWorldIntent")
 def query_world():
-    res = requests.post('https://2871f0ed.ngrok.io/alexa', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
+    p('foo')
+    res = requests.post('https://2871f0ed.ngrok.io/alexa', data = dumps({'command' : 0}), headers = 
+        {'content-type' : 'application/json', 'Connection': 'Keep-alive'})
     return question(buildQueryList(getQueryList()))
 
 @app.route('/queryResponse', methods=['POST'])
@@ -115,4 +123,5 @@ def shutdown():
     return 'Server shutting down...'
 
 if __name__ == '__main__':
+    WSGIRequestHandler.protocol_version = "HTTP/1.1"
     app.run(debug=True, threaded=True)
