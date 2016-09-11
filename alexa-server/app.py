@@ -67,7 +67,7 @@ def quit():
 
 @ask.intent("QueryWorldIntent")
 def query_world():
-    res = requests.post('https://e404a956.ngrok.io/alexa', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
+    res = requests.post('https://alexa-unreal.herokuapp.com', data = dumps({'command' : 0}), headers = {'content-type' : 'application/json'})
     return question(buildQueryList(getQueryList()))
 
 @app.route('/queryResponse', methods=['POST'])
