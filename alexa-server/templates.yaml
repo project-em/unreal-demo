@@ -7,7 +7,7 @@ press: I pressed the {{ buttonMsg }} button
 
 query: I see {{ queryStr }}
 
-locate: I see {{ queryStr }}
+locate: hmm I see {{ queryStr }}
 
 round: Can you repeat the numbers {{ numbers|join(", ") }} backwards?
 

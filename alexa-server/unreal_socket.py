@@ -12,6 +12,7 @@ class UnrealCommand(object):
     PressGreen = 3
     PressYellow = 4
     QueryNumbers = 5
+    NumbersSuccess = 6
 
 class UnrealSocket(object):
 
