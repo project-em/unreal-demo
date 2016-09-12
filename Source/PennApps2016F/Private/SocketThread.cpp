@@ -64,6 +64,7 @@ uint32 FSocketThread::Run()
 		int32 command = FCString::Atoi((wchar_t *) buf.GetData());
 		alexaEvent->Broadcast(command);
 		clientSocket->Close();
+		buf.Empty();
 	}
 	return 0;
 }
