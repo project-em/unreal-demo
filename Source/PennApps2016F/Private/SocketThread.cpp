@@ -39,34 +39,31 @@ uint32 FSocketThread::Run()
 	TArray<uint8> buf;
 	int32 bytesRead = 0;
 	uint32 pendingDataSize = 0;
-	bool foo;
+	bool hasConnectionPending;
 	while (StopTaskCounter.GetValue() == 0)
 	{
-		socket->HasPendingConnection(foo);
-		while (!foo && StopTaskCounter.GetValue() == 0)
-		{
+		do {
+			// Sleep untill a client is available
+			socket->HasPendingConnection(hasConnectionPending);
 			Sleep(1);
-			socket->HasPendingConnection(foo);
-		}
+		} while (!hasConnectionPending && StopTaskCounter.GetValue() == 0);
 		// at this point there is a client waiting
-		clientSocket = socket->Accept(TEXT("Connected to client.:"));
-		if (clientSocket == NULL) continue;
-		while (StopTaskCounter.GetValue() == 0)
-		{
+		clientSocket = socket->Accept(TEXT("Remote Python Connection"));
+		if (clientSocket == NULL) continue; // sanity check
+		do {
+			// Sleep until data is available 
 			Sleep(1);
-			if (!clientSocket->HasPendingData(pendingDataSize)) continue;
-			buf.Init(0, pendingDataSize);
-			clientSocket->Recv(buf.GetData(), buf.Num(), bytesRead);	
-			if (bytesRead < 1) {
-				UE_LOG(LogTemp, Error, TEXT("Socket did not receive enough data: %d"), bytesRead);
-				return 1;
-			}
-			int32 command = (buf[0] - '0');
-			// call custom event with number here
-			alexaEvent->Broadcast(command);
+		} while (!clientSocket->HasPendingData(pendingDataSize) && StopTaskCounter.GetValue() == 0);
+		buf.Init(0, pendingDataSize / 8); // allocate umber of chars available
+		clientSocket->Recv(buf.GetData(), buf.Num(), bytesRead);	
+		if (bytesRead < 1) {
+			UE_LOG(LogTemp, Error, TEXT("Socket did not receive enough data: %d"), bytesRead);
 			clientSocket->Close();
-			break; // go back to wait state
+			continue;	
 		}
+		int32 command = FCString::Atoi((wchar_t *) buf.GetData());
+		alexaEvent->Broadcast(command);
+		clientSocket->Close();
 	}
 	return 0;
 }

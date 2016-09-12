@@ -35,7 +35,6 @@ void ATCPSocket::Tick( float DeltaTime )
 void ATCPSocket::CreateSocket()
 {
 	socket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("default"), false);
-	address = TEXT("158.130.163.72");
 	bool canBind;
 	TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(*GLog, canBind);
 	port = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->BindNextPort(socket, *addr, 1000, 1);

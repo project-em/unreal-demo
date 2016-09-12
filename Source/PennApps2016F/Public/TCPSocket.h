@@ -5,7 +5,9 @@
 #include "GameFramework/Actor.h"
 #include "Networking.h"
 #include "TCPSocket.generated.h"
-class FSocketThread;
+
+class FSocketThread; // avoid repeated imports
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAlexaEvent, int32, event_id);
 UCLASS()
 class PENNAPPS2016F_API ATCPSocket : public AActor

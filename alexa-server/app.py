@@ -53,9 +53,6 @@ def execute_command():
         p('shit')
         return 'Nope'
 
-def execute_inner():
-    app.sock.process_command()
-
 @ask.launch
 def new_game():
     welcome_msg = render_template('welcome')
