@@ -46,7 +46,7 @@ def register_client():
 def execute_command():
     p('test')
     if app.sock:
-        app.sock.send(equest.json['command'])
+        app.sock.send(request.json['command'])
         p('ok')
         return 'OK'
     else:
