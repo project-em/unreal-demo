@@ -6,7 +6,7 @@ from json import dumps
 from unreal_socket import UnrealSocket
 from random import randint, choice
 from werkzeug.serving import WSGIRequestHandler
-
+from threaded_request import ThreadedRequest, RequestType
 import requests
 import sys
 import logging
@@ -21,7 +21,7 @@ cache = SimpleCache()
 
 # query_list = []
 
-ROOT_URL = 'https://1c091db0.ngrok.io'
+ROOT_URL = 'https://alexa2-unral.herokuapp.com'
 app.debug = True
 app.threaded = True
 WSGIRequestHandler.protocol_version = "HTTP/1.1"
@@ -45,14 +45,8 @@ def register_client():
 @app.route('/alexa', methods=['POST'])
 def execute_command():
     p('test')
-    p(str(app))
-    p(str(app.sock))
-    # Step 4
     if app.sock:
-        app.sock.command_name = request.json['command']
-        thread = threading.Thread(target=execute_inner)
-        thread.daemon = True
-        thread.start()
+        app.sock.send(equest.json['command'])
         p('ok')
         return 'OK'
     else:
@@ -74,14 +68,9 @@ def press_button(color):
     elif(color == 'blue'): command = 2
     elif(color == 'green'): command = 3
     elif(color == 'yellow'): command = 4
-    thread = threading.Thread(target=stupid_thread_2, args=[command])
-    thread.daemon = True
-    thread.start()
+    reqs = ThreadedRequest(ROOT_URL + '/alexa', RequestType.Post, data={'command' : command})
     button_msg = render_template('press', buttonMsg = color)
     return question(button_msg)
-
-def stupid_thread_2(command):
-    res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : command}), headers = {'content-type' : 'application/json'})
 
 @ask.intent("QuitIntent")
 def quit():
@@ -89,23 +78,13 @@ def quit():
 
 @ask.intent("QueryWorldIntent")
 def query_world():
-    p('foo')
-    thread = threading.Thread(target=stupid_thread)
-    thread.daemon = True
-    thread.start()
+    reqs = ThreadedRequest(ROOT_URL + '/alexa', RequestType.Post, data = {'command' : 0})
     return question(buildQueryList(getQueryList()))
 
 @ask.intent("NumberIntent")
 def number_query():
-    p('goo')
-    thread = threading.Thread(target=stupid_thread_2, args=[5])
-    thread.daemon = True
-    thread.start()
+    reqs = ThreadedRequest(ROOT_URL + '/alexa', RequestType.Post, data={'command' : command})
     return question(buildSayList(getSpeech()))
-
-def stupid_thread():
-    res = requests.post(ROOT_URL + '/alexa', data = dumps({'command' : 0}), headers = 
-        {'content-type' : 'application/json'})
 
 @app.route('/say', methods=['POST'])
 def execute_random():
@@ -125,10 +104,7 @@ def answer(first, second, third, fourth):
         return statement(render_template('lose'))
     if [first, second, third, fourth] == winning_numbers:
         msg = render_template('win')
-        p('goo')
-        thread = threading.Thread(target=stupid_thread_2, args=[6])
-        thread.daemon = True
-        thread.start()
+        reqs = ThreadedRequest(ROOT_URL + '/alexa', RequestType.Post, data={'command' : 6})
     else:
         msg = render_template('lose')
     return statement(msg)
@@ -158,10 +134,7 @@ def buildQueryList(query_list):
 
 @ask.intent("LocationIntent")
 def locate_surounding():
-    p('goo')
-    thread = threading.Thread(target=stupid_thread_2, args=[0])
-    thread.daemon = True
-    thread.start()
+    reqs = ThreadedRequest(ROOT_URL + '/alexa', RequestType.Post, data={'command' : 0})
     return question(buildQueryList(getQueryList()))
 
 @ask.intent("NameIntent")
