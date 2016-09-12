@@ -20,7 +20,7 @@ class UnrealSocket(object):
         self.thread = None
 
     def send(self, command):
-        thread = threading.Thread(target=execute_command, args=[command])
+        thread = threading.Thread(target=self.execute_command, args=[command])
         thread.daemon = True
         thread.start()
 
