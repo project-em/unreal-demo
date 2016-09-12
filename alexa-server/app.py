@@ -21,7 +21,7 @@ cache = SimpleCache()
 
 # query_list = []
 
-ROOT_URL = 'https://alexa2-unral.herokuapp.com'
+ROOT_URL = 'https://alexa.sachabest.com'
 app.debug = True
 app.threaded = True
 WSGIRequestHandler.protocol_version = "HTTP/1.1"
