@@ -31,5 +31,3 @@ class UnrealSocket(object):
         active_socket.send(str(command))
         p('Send command: {0}'.format(str(command)))
         active_socket.close()
-        self.thread.exit()
-        self.thread = None

@@ -1,6 +1,7 @@
 import requests
 import threading
 from json import dumps
+from heroku_logger import p
 
 class RequestType(object):
 
@@ -28,6 +29,7 @@ class ThreadedRequest(object):
 		elif self.request_type == RequestType.Post:
 			self.headers['Content-type'] = 'application/json'
 			self.response = requests.post(self.url, data=dumps(self.data), headers=self.headers)
+			p(str(self.url))
 		elif self.RequestType == RequestType.Put:
 			self.response = requests.put(self.url, data=self.data, headers=self.headers)
 		elif self.RequestType == RequestType.Delete:

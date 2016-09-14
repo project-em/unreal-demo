@@ -2,6 +2,8 @@
 
 #include "PennApps2016F.h"
 #include "SocketThread.h"
+#include <stdlib.h>     /* atoi */
+
 
 // Singleton
 FSocketThread* FSocketThread::Runnable = NULL;
@@ -54,17 +56,16 @@ uint32 FSocketThread::Run()
 			// Sleep until data is available 
 			Sleep(1);
 		} while (!clientSocket->HasPendingData(pendingDataSize) && StopTaskCounter.GetValue() == 0);
-		buf.Init(0, pendingDataSize / 8); // allocate umber of chars available
+		buf.Init(0, pendingDataSize); // allocate umber of chars available
 		clientSocket->Recv(buf.GetData(), buf.Num(), bytesRead);	
 		if (bytesRead < 1) {
 			UE_LOG(LogTemp, Error, TEXT("Socket did not receive enough data: %d"), bytesRead);
 			clientSocket->Close();
 			continue;	
 		}
-		int32 command = FCString::Atoi((wchar_t *) buf.GetData());
+		int32 command = atoi((char *) buf.GetData());
 		alexaEvent->Broadcast(command);
 		clientSocket->Close();
-		buf.Empty();
 	}
 	return 0;
 }

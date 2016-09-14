@@ -21,7 +21,7 @@ cache = SimpleCache()
 
 # query_list = []
 
-ROOT_URL = 'https://alexa.sachabest.com'
+ROOT_URL = 'https://4f50efe3.ngrok.io'
 app.debug = True
 app.threaded = True
 WSGIRequestHandler.protocol_version = "HTTP/1.1"
@@ -80,7 +80,7 @@ def query_world():
 
 @ask.intent("NumberIntent")
 def number_query():
-    reqs = ThreadedRequest(ROOT_URL + '/alexa', RequestType.Post, data={'command' : command})
+    reqs = ThreadedRequest(ROOT_URL + '/alexa', RequestType.Post, data={'command' : 5})
     return question(buildSayList(getSpeech()))
 
 @app.route('/say', methods=['POST'])
